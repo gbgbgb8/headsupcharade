@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON to Header File Converter</title>
+</head>
+<body>
+    <h1>JSON to Arduino Header File Converter</h1>
+    
+    <textarea id="jsonInput" placeholder="Paste your JSON here" rows="10" cols="50"></textarea>
+    <br>
+    <button onclick="convertToJson()">Convert to .h</button>
+    <br>
+    <textarea id="hOutput" placeholder="Your .h file content will appear here" rows="20" cols="50"></textarea>
+
+    <script>
+        function convertToJson() {
+            const jsonInput = document.getElementById('jsonInput').value;
+            try {
+                const jsonData = JSON.parse(jsonInput);
+                let output = '#include <avr/pgmspace.h>\n\n';
+                let wordIndex = 1;
+
+                for (const category in jsonData.words) {
+                    jsonData.words[category].forEach(word => {
+                        output += `const char word_${wordIndex}[] PROGMEM = "${word}";\n`;
+                        wordIndex++;
+                    });
+                    output += `\n`;
+                }
+
+                output += '\n';
+                wordIndex = 1;
+                for (const category in jsonData.words) {
+                    output += `PGM_P const words${capitalizeFirstLetter(category)}[] PROGMEM = {\n`;
+                    jsonData.words[category].forEach(() => {
+                        output += `  word_${wordIndex}, `;
+                        wordIndex++;
+                    });
+                    output = output.slice(0, -2) + '\n};\n\n';
+                }
+
+                document.getElementById('hOutput').value = output;
+            } catch (e) {
+                alert('Invalid JSON input');
+            }
+        }
+
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+    </script>
+</body>
+</html>
