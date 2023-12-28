@@ -26,8 +26,6 @@ unsigned long startTime;
 int remainingTurns;
 PGM_P const *currentWordList;
 int currentWordIndex = 0;
-int numWordsInCategory;
-int wordIndices[163]; 
 
 void setup() {
   arduboy.begin();
@@ -67,9 +65,11 @@ void drawStartScreen() {
   arduboy.print(F("Heads-Up Charade"));
 
   for (int i = 0; i < numGameModes; i++) {
-    arduboy.setCursor(10, 10 + i * 10);
     if (i == gameModeSelection && selectionState == MODE) {
-      arduboy.print(F("> "));
+      arduboy.setCursor(0, 10 + i * 10);
+      arduboy.print(F("> ")); 
+    } else {
+      arduboy.setCursor(10, 10 + i * 10);
     }
     arduboy.print(gameModes[i]);
   }
@@ -80,15 +80,16 @@ void drawStartScreen() {
   arduboy.print(turnOptions[turnOptionSelection]);
   if (selectionState == TURNS) {
     arduboy.setCursor(60, 10);
-    arduboy.print(F(">"));
+    arduboy.print(F(">")); 
   }
 
   arduboy.setCursor(70, 30);
   arduboy.print(F("Timer: "));
   arduboy.print(timerOptions[timerOptionSelection]);
+  arduboy.print(F("s"));
   if (selectionState == TIMER) {
     arduboy.setCursor(60, 30);
-    arduboy.print(F(">"));
+    arduboy.print(F(">")); 
   }
 }
 
@@ -130,43 +131,14 @@ void handleStartScreenInput() {
   }
 }
 
-void shuffle(int *array, int size) {
-  for (int i = 0; i < size - 1; i++) {
-    int j = i + rand() % (size - i);
-    int temp = array[j];
-    array[j] = array[i];
-    array[i] = temp;
-  }
-}
-
 void startGame() {
   switch (gameModeSelection) {
-    case 0: 
-      currentWordList = wordsEasy; 
-      numWordsInCategory = 99; 
-      break;
-    case 1: 
-      currentWordList = wordsMedium; 
-      numWordsInCategory = 163; 
-      break;
-    case 2: 
-      currentWordList = wordsDifficult; 
-      numWordsInCategory = 101; 
-      break;
-    case 3: 
-      currentWordList = wordsHard; 
-      numWordsInCategory = 61; 
-      break;
-    case 4: 
-      currentWordList = wordsActions; 
-      numWordsInCategory = 70; 
-      break;
+    case 0: currentWordList = wordsEasy; break;
+    case 1: currentWordList = wordsMedium; break;
+    case 2: currentWordList = wordsDifficult; break;
+    case 3: currentWordList = wordsHard; break;
+    case 4: currentWordList = wordsActions; break;
   }
-
-  for (int i = 0; i < numWordsInCategory; i++) {
-    wordIndices[i] = i;
-  }
-  shuffle(wordIndices, numWordsInCategory);
   currentWordIndex = 0;
   score = 0;
   remainingTurns = turnOptions[turnOptionSelection];
@@ -188,36 +160,18 @@ void drawGameScreen() {
   arduboy.setCursor(80, 0);
   arduboy.print(remainingTime);
 
-  
-  const int charWidth = 6; 
-  char buffer[50]; 
-  strcpy_P(buffer, (char*)pgm_read_word(&(currentWordList[wordIndices[currentWordIndex]])));
-  int lineHeight = 8; 
-  int x = 0;
-  int y = 30; 
-  int screenWidth = WIDTH; 
-
-  char *word = strtok(buffer, " ");
-  while (word) {
-    int wordWidth = strlen(word) * charWidth;
-    if (x + wordWidth > screenWidth) { 
-      x = 0; 
-      y += lineHeight; 
-    }
-    arduboy.setCursor(x, y);
-    arduboy.print(word);
-    x += wordWidth + charWidth; 
-    word = strtok(NULL, " "); 
-  }
+  arduboy.setCursor(0, 30);
+  char buffer[30];
+  strcpy_P(buffer, (char*)pgm_read_word(&(currentWordList[currentWordIndex])));
+  arduboy.print(buffer);
 }
-
 
 void nextWord() {
   remainingTurns--;
   if (remainingTurns <= 0) {
     gameState = END;
   } else {
-    currentWordIndex = (currentWordIndex + 1) % numWordsInCategory;
+    currentWordIndex = (currentWordIndex + 1) % 6; 
     startTime = millis();
   }
 }
