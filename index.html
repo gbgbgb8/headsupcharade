@@ -24,6 +24,7 @@
                 let output = '#include <avr/pgmspace.h>\n\n';
                 let wordIndex = 1;
                 let gameSwitchCases = '';
+                let caseIndex = 0;
 
                 for (const category in jsonData.words) {
                     let categoryWordCount = 0;
@@ -54,8 +55,9 @@
                 for (const category in jsonData.words) {
                     const categoryCapitalized = capitalizeFirstLetter(category);
                     const categoryWordCount = jsonData.words[category].length;
-                    gameSwitchCases += `    case ${wordIndex - categoryWordCount}: \n      currentWordList = words${categoryCapitalized}; \n      numWordsInCategory = ${categoryWordCount}; \n      break;\n`;
+                    gameSwitchCases += `    case ${caseIndex}: \n      currentWordList = words${categoryCapitalized}; \n      numWordsInCategory = ${categoryWordCount}; \n      break;\n`;
                     wordIndex += categoryWordCount;
+                    caseIndex++;
                 }
                 
                 const startGameFunction = `void startGame() {\n  switch (gameModeSelection) {\n${gameSwitchCases}  }\n}`;
