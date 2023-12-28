@@ -10,6 +10,6 @@ Take any, all, or none of this code.
 There is a utility to convert json word lists to .h header file word lists in the index.html 
 
 
-https://felipemanga.github.io/ProjectABE/?url=[https://site/file.hex](https://github.com/gbgbgb8/headsupcharade/blob/main/build/arduboy.avr.arduboy/headsupcharade.ino.hex)https://github.com/gbgbgb8/headsupcharade/blob/main/build/arduboy.avr.arduboy/headsupcharade.ino.hex
+https://felipemanga.github.io/ProjectABE/?url=https://github.com/gbgbgb8/headsupcharade/blob/main/build/arduboy.avr.arduboy/headsupcharade.ino.hex
 
 
