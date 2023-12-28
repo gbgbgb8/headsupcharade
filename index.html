@@ -21,25 +21,34 @@
                 const jsonData = JSON.parse(jsonInput);
                 let output = '#include <avr/pgmspace.h>\n\n';
                 let wordIndex = 1;
+                let gameSwitchCases = '';
 
                 for (const category in jsonData.words) {
+                    let categoryWordCount = 0;
                     jsonData.words[category].forEach(word => {
                         output += `const char word_${wordIndex}[] PROGMEM = "${word}";\n`;
                         wordIndex++;
+                        categoryWordCount++;
                     });
                     output += `\n`;
+                    const categoryCapitalized = capitalizeFirstLetter(category);
+                    gameSwitchCases += `    case ${wordIndex - categoryWordCount - 1}: \n      currentWordList = words${categoryCapitalized}; \n      numWordsInCategory = ${categoryWordCount}; \n      break;\n`;
                 }
 
                 output += '\n';
                 wordIndex = 1;
                 for (const category in jsonData.words) {
-                    output += `PGM_P const words${capitalizeFirstLetter(category)}[] PROGMEM = {\n`;
+                    const categoryCapitalized = capitalizeFirstLetter(category);
+                    output += `PGM_P const words${categoryCapitalized}[] PROGMEM = {\n`;
                     jsonData.words[category].forEach(() => {
                         output += `  word_${wordIndex}, `;
                         wordIndex++;
                     });
                     output = output.slice(0, -2) + '\n};\n\n';
                 }
+
+                // Add the gameSwitchCases to the output
+                output += `void startGame() {\n  switch (gameModeSelection) {\n${gameSwitchCases}  }\n}`;
 
                 document.getElementById('hOutput').value = output;
             } catch (e) {
